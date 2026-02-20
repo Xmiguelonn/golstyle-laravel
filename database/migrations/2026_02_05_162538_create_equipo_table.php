@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('equipo', function (Blueprint $table) {
             
             $table->id('cod_equi');
-            $table->string('nombre', 50);
+            $table->string('nombre', 50)->unique();
             $table->unsignedBigInteger('cod_lig');
 
             // CLAVES FORÁNEAS
