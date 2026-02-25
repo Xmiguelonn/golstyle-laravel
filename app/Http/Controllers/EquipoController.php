@@ -12,6 +12,7 @@ class EquipoController extends Controller
     /**
      * Summary of index
      * @return \Illuminate\Database\Eloquent\Collection<int, Equipo>|\Illuminate\Support\Collection<int, \stdClass>
+     * 
      * ? GET /api/equipos
      * ! Devuelve todos los equipos
      */
