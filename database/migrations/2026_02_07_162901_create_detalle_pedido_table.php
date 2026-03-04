@@ -12,19 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detalle_pedido', function (Blueprint $table) {
-
-            $table->id('cod_det_ped');
-
+            $table->unsignedBigInteger('cod_det_ped')->autoIncrement();
             $table->decimal('precio_unid', 10, 2);
             $table->integer('cantidad');
-
             $table->unsignedBigInteger('cod_ped');
             $table->unsignedBigInteger('cod_var');
-
             $table->string('nombre_personalizado', 50)->nullable();
             $table->tinyInteger('dorsal_personalizado')->unsigned()->nullable();
-            
-            // Claves foráneas
+
+            // CLAVES FORÁNEAS
             $table->foreign('cod_ped')->references('cod_ped')->on('pedido')->cascadeOnDelete();
             $table->foreign('cod_var')->references('cod_var')->on('variantes_camiseta')->cascadeOnDelete();
         });

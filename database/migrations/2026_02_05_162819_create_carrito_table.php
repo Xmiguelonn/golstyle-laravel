@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('carrito', function (Blueprint $table) {
 
             $table->id('cod_carr');
-            $table->unsignedBigInteger('cod_usu');
+            $table->unsignedBigInteger('cod_usu')->unique();
             $table->timestamp('fecha_creacion')->useCurrent();
 
             // CLAVES FORÁNEAS

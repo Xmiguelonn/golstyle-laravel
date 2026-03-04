@@ -12,18 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('direccion', function (Blueprint $table) {
-
-            $table->id('cod_dir');
+            $table->unsignedBigInteger('cod_dir')->autoIncrement();
             $table->string('calle', 100);
             $table->string('num', 10);
             $table->string('piso', 10)->nullable();
             $table->string('cp', 10);
+            $table->string('telefono', 20);
             $table->unsignedBigInteger('cod_usu');
             $table->unsignedBigInteger('cod_ciu');
 
-            // CLAVER FORÁNEAS
-            $table->foreign('cod_usu')->references('cod_usu')->on('usuario');
-            $table->foreign('cod_ciu')->references('cod_ciu')->on('ciudad');
+            // CLAVES FORÁNEAS
+            $table->foreign('cod_usu')->references('cod_usu')->on('usuario')->cascadeOnDelete();
+            $table->foreign('cod_ciu')->references('cod_ciu')->on('ciudad')->restrictOnDelete();
         });
     }
 

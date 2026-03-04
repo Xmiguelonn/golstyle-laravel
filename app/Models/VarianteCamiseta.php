@@ -11,7 +11,11 @@ class VarianteCamiseta extends Model
     protected $primaryKey = 'cod_var';
     public $timestamps = false;
 
-    protected $fillable = ['cod_cam', 'talla', 'stock', 'precio'];
+    protected $fillable = [
+        'cod_cam',
+        'talla', 
+        'stock', 
+        ];
 
     /**
      * Summary of camiseta
@@ -24,5 +28,16 @@ class VarianteCamiseta extends Model
         return $this->belongsTo(Camiseta::class, 'cod_cam');
     }
 
+    /**
+     * Summary of getPrecioAttribute
+     * 
+     * * Devuelve el precio de la camiseta
+     */
+    public function getPrecioAttribute() {
+
+        return $this->camiseta->precio ?? null;
+    }
+
+    protected $appends = ['precio'];
 
 }

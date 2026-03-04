@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cod_lig');
 
             // CLAVES FORÁNEAS
-            $table->foreign('cod_lig')->references('cod_lig')->on('liga');
+            $table->foreign('cod_lig')->references('cod_lig')->on('liga')->restrictOnDelete();
         });
     }
 

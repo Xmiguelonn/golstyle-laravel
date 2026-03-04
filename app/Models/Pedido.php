@@ -51,7 +51,7 @@ class Pedido extends Model
      */
     public function direccion(): BelongsTo {
 
-        return $this->belongsTo(Direccion::class, 'cod_dir');
+        return $this->belongsTo(Direccion::class, 'cod_dir')->withDefault();
     }
 
 

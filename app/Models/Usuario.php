@@ -19,7 +19,6 @@ class Usuario extends Model
         'ape2',
         'correo',
         'password',
-        'telefono',
         'rol',
     ];
 

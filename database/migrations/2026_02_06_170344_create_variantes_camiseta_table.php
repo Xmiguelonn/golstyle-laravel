@@ -12,15 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('variantes_camiseta', function (Blueprint $table) {
-
-            $table->id('cod_var');
-
+            $table->unsignedBigInteger('cod_var')->autoIncrement();
             $table->unsignedBigInteger('cod_cam');
             $table->string('talla', 5);
             $table->integer('stock')->default(0);
-            $table->decimal('precio', 10, 2);
 
-            // Foreign key
+            // CLAVES FORÁNEAS
             $table->foreign('cod_cam')->references('cod_cam')->on('camiseta')->cascadeOnDelete();
         });
     }

@@ -16,6 +16,7 @@ class Direccion extends Model
         'num',
         'piso',
         'cp',
+        'telefono',
         'cod_usu',
         'cod_ciu',
     ];

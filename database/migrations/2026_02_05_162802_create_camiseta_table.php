@@ -12,15 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('camiseta', function (Blueprint $table) {
-
-            $table->id('cod_cam');
+            $table->unsignedBigInteger('cod_cam')->autoIncrement();
+            $table->string('nombre', 100);
             $table->string('color', 30);
             $table->unsignedBigInteger('cod_equi')->nullable();
             $table->unsignedBigInteger('cod_sel')->nullable();
             $table->unsignedBigInteger('cod_tem');
+            $table->decimal('precio', 10, 2);
             $table->longText('imagen_principal')->nullable();
 
-            // CLAVES FORÁNEAS
+            // CLABES FORÁNEAS
             $table->foreign('cod_equi')->references('cod_equi')->on('equipo');
             $table->foreign('cod_sel')->references('cod_sel')->on('seleccion');
             $table->foreign('cod_tem')->references('cod_tem')->on('temporada');

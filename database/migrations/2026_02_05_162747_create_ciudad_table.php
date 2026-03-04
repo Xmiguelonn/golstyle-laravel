@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cod_pro');
 
             // CLAVES FORÁNEAS
-            $table->foreign('cod_pro')->references('cod_pro')->on('provincia');
+            $table->foreign('cod_pro')->references('cod_pro')->on('provincia')->restrictOnDelete();
         });
     }
 

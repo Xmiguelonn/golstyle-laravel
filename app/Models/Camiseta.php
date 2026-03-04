@@ -13,10 +13,12 @@ class Camiseta extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'nombre',
         'color', 
         'cod_equi', 
         'cod_sel', 
-        'cod_tem', 
+        'cod_tem',
+        'precio', 
         'imagen_principal'
         ];
 
