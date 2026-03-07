@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Carrito;
 use Illuminate\Http\Request;
+use App\Models\VarianteCamiseta;
+use APP\Models\DetalleCarrito;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CarritoController extends Controller
 {
@@ -71,6 +74,106 @@ class CarritoController extends Controller
 
         return Carrito::findOrFail($id)->usuario;
     }
+
+    /**
+     * Summary of agregar
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     *  ? POST /api/carrito/agregar
+     * ! Endpoint para agregar un producto al carrito
+     */
+    public function agregar(Request $request): JsonResponse {
+
+        // OBTENER EL USUARIO AUTENTICADO
+        $usuario = $request->user();
+
+        // VALIDACIÓN DE PARÁMETROS
+        $request->validate([
+
+            'cod_var' => 'required|integer',
+            'cantidad' => 'required|integer|min:1',
+            'nombre_personalizado' => 'nullable|string|max:50',
+            'dorsal_personalizado' => 'nullable|integer|min:0|max:99'
+        ]);
+
+        // COMPROBAR QUE LA CAMISETA EXISTE
+        $variante = VarianteCamiseta::find($request->cod_var);
+
+        if (!$variante) {
+
+            return response()->json([
+
+                'error' => 'Variante no encontrada'
+            ], 404);
+        }
+
+        // COMPROBAR STOCK
+        if ($variante->stock < $request->cantidad ) {
+
+            return response()->json([
+
+                'error' => 'Stock insuficiente'
+            ], 400);
+        }
+
+        // BUSCAR O CREAR EL CARRITO DEL USUARIO
+        $carrito = Carrito::firstOrCreate([
+
+            'cod_usu' => $usuario->cod_usu
+        ]);
+
+        // COMPROBAR SI YA EXISTE UNA CAMISETA IGUAL
+        $detalleQuery = DetalleCarrito::where('cod_carr', $carrito->cod_carr)->where('cod_var', $request->cod_var);
+
+        // Comprobar el nombre personalizado
+        if ($request->nombre_personalizado === null) {
+
+            $detalleQuery->whereNull('nombre_personalizado');
+        } else {
+
+            $detalleQuery->where('nombre_personalizado', $request->nombre_personalizado);
+        }
+
+        // Comprobar el dorsal personalizado
+        if ($request->dorsal_personalizado === null) {
+
+            $detalleQuery->whereNull('dorsal_personalizado');
+        } else {
+
+            $detalleQuery->where('dorsal_personalizado', $request->dorsal_personalizado);
+        }
+
+        // Hacer la consulta
+        $detalle = $detalleQuery->first();
+
+
+        if ($detalle) {
+
+            $detalle->cantidad += $request->cantidad;
+            // actualizar cantidad en la base de datos
+            $detalle->save();
+        } else {
+            
+            // crear el nuevo detalle de carrito y añadirlo a la base de datos
+            $detalle = DetalleCarrito::create([
+
+                'cod_carr' => $carrito->cod_carr,
+                'cod_var' => $request->cod_var,
+                'cantidad' => $request->cantidad,
+                'nombre_personalizado' => $request->nombre_personalizado,
+                'dorsal_personalizado' => $request->dorsal_personalizado,
+            ]);
+        }
+
+        // Devolver el resultado
+        return response()->json([
+            'mensaje' => 'Producto añadido al carrito',
+            'detalle' => $detalle,
+        ]);
+
+    }
+
 
 
     /**

@@ -6,6 +6,7 @@ use App\Models\Camiseta;
 use App\Models\ImagenCamiseta;
 use App\Models\VarianteCamiseta;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CamisetaController extends Controller
 {
@@ -29,6 +30,74 @@ class CamisetaController extends Controller
     }
 
     /**
+     * Summary of catalogo
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     * ? GET /api/camisetas/catalogo
+     * ! Devuelve la información PAGINADA para el catálogo 
+     */
+    public function catalogo(Request $request): JsonResponse {
+
+    $query = Camiseta::with([
+
+        'equipo.liga',
+        'seleccion',
+        'temporada',
+    ]);
+
+    // FILTROS DE BÚSQUEDA
+    if ($request->liga) {
+
+        $query->whereRelation('equipo.liga', 'nombre', $request->liga);
+    }
+
+    if ($request->equipo) {
+
+        $query->whereRelation('equipo', 'nombre', $request->equipo);
+    }
+
+    if ($request->seleccion) {
+
+        $query->whereRelation('seleccion', 'nombre', $request->seleccion);
+    }
+
+    if ($request->temporada) {
+
+        $query->whereRaw("CONCAT(inicio, '/', fin) = ?", [$request->temporada]);
+    }
+
+    // PAGINACIÓN
+    $camisetas = $query->paginate(20);
+
+    // CREAR ARRAY RESULTADO
+    $resultado = [];
+
+    foreach ($camisetas as $camiseta) {
+
+        $resultado[] = [
+
+            'cod_cam' => $camiseta->cod_cam,
+            'nombre' => $camiseta->nombre,
+            'imagen_principal' => $camiseta->imagen_principal,
+            'precio' => $camiseta->precio,
+            'equipo' => $camiseta->equipo?->nombre,
+            'liga' => $camiseta->equipo?->liga?->nombre,
+            'seleccion' => $camiseta->seleccion?->nombre,
+            'temporada' => $camiseta->temporada->inicio . '/' . $camiseta->temporada->fin,
+        ];
+    }
+
+    // REEMPLAZAR LA COLECCIÓN DEL PAGINADOR
+    $camisetas->setCollection(collect($resultado));
+
+    // DEVOLVER RESULTADO
+    return response()->json($camisetas);
+}
+
+
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -36,23 +105,67 @@ class CamisetaController extends Controller
         //
     }
 
+
     /**
      * Summary of show
      * @param mixed $id
-     * @return Camiseta|\Illuminate\Database\Eloquent\Collection<int, Camiseta>
+     * @return \Illuminate\Http\JsonResponse
      * 
      * ? GET /api/camisetas/{id}
-     * ! Devuelve la información de una camiseta asociada a un ID
+     * ! Devuelve los detalles de una camiseta asociada a un ID
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        return Camiseta::with([
-            'variantes',
-            'imagenes',
-            'temporada',
+        $camiseta = Camiseta::with([
+
+            'equipo.liga',
             'seleccion',
-            'equipo'
-        ])->findOrFail($id);
+            'temporada',
+            'imagenes',
+            'variantes'
+        ])->find($id);
+
+        // Si no existe la camiseta, devolvemos un error 404
+        if (!$camiseta) {
+
+            return response()->json([
+                'error' => 'Camiseta no encontrada'
+            ], 404);
+        }
+
+        // CREAR ARRAY RESULTADO
+
+        $resultado = [
+
+            'cod_cam' => $camiseta->cod_cam,
+            'nombre' => $camiseta->nombre,
+            'color' => $camiseta->color,
+            'precio' => $camiseta->precio,
+            'imagen_principal' => $camiseta->imagen_principal,
+
+            // RELACIONES
+            'equipo' => $camiseta->equipo?->nombre,
+            'liga' => $camiseta->equipo?->liga?->nombre,
+            'seleccion' => $camiseta->seleccion?->nombre,
+            'temporada' => $camiseta->temporada->inicio . '/' . $camiseta->temporada->fin,
+
+            // IMÁGENES
+            //! de la IMAGENES devuelve solo la columna IMAGEN
+            'imagenes' => $camiseta->imagenes->pluck('imagen'),
+
+            // Variantes (tallas + stock)
+            'variantes' => $camiseta->variantes->map(function ($var) {
+
+                return [
+
+                    'cod_var' => $var->cod_var,
+                    'talla' => $var->talla,
+                    'stock' => $var->stock,
+                ];
+            }),
+        ];
+
+        return response()->json($resultado);
     }
 
     /**

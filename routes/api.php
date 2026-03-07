@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
  * 
  */
 Route::get('/camisetas', [CamisetaController::class, 'index']);
+Route::get('/camisetas/catalogo', [CamisetaController::class, 'catalogo']);
 Route::get('/camisetas/{id}', [CamisetaController::class, 'show']);
 Route::get('/camisetas/{id}/variantes', [CamisetaController::class, 'variantes']);
 Route::get('/camisetas/{id}/imagenes', [CamisetaController::class, 'imagenes']);
@@ -90,6 +91,7 @@ Route::get('/carritos', [CarritoController::class, 'index']);
 Route::get('/carritos/{id}', [CarritoController::class, 'show']);
 Route::get('/carritos/{id}/detalles', [CarritoController::class, 'detalles']);
 Route::get('/carritos/{id}/usuario', [CarritoController::class, 'usuario']);
+Route::middleware('auth:sanctum')->post('/carrito/agregar', [CarritoController::class, 'agregar']);
 
 /**
  * 
