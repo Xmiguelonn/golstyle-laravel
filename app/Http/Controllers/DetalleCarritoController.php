@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Carrito;
 use App\Models\DetalleCarrito;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class DetalleCarritoController extends Controller
 {
@@ -33,15 +34,15 @@ class DetalleCarritoController extends Controller
 
 
 
+
     /**
      * Summary of show
      * @param mixed $cod_usu
      * @return \Illuminate\Http\JsonResponse
-     * 
      * ? GET /api/detalle-carritos/{id}
      * ! Devuelve un detalle de carrito asociado a un ID
      */
-    public function show($cod_usu)
+    public function show($cod_usu): JsonResponse 
     {
         $carrito = Carrito::with([
             'detalles.variante.camiseta'

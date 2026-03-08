@@ -6,7 +6,7 @@ use App\Models\Camiseta;
 use App\Models\ImagenCamiseta;
 use App\Models\VarianteCamiseta;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Http\JsonResponse;
 
 class CamisetaController extends Controller
 {
@@ -37,63 +37,120 @@ class CamisetaController extends Controller
      * ? GET /api/camisetas/catalogo
      * ! Devuelve la información PAGINADA para el catálogo 
      */
-    public function catalogo(Request $request): JsonResponse {
+    public function catalogo(Request $request): JsonResponse
+    {
 
-    $query = Camiseta::with([
+        $query = Camiseta::with([
 
-        'equipo.liga',
-        'seleccion',
-        'temporada',
-    ]);
+            'equipo.liga',
+            'seleccion',
+            'temporada',
+        ]);
 
-    // FILTROS DE BÚSQUEDA
-    if ($request->liga) {
+        // FILTROS DE BÚSQUEDA
+        if ($request->liga) {
 
-        $query->whereRelation('equipo.liga', 'nombre', $request->liga);
+            $query->whereRelation('equipo.liga', 'nombre', $request->liga);
+        }
+
+        if ($request->equipo) {
+
+            $query->whereRelation('equipo', 'nombre', $request->equipo);
+        }
+
+        if ($request->seleccion) {
+
+            $query->whereRelation('seleccion', 'nombre', $request->seleccion);
+        }
+
+        if ($request->temporada) {
+
+            $query->whereRaw("CONCAT(inicio, '/', fin) = ?", [$request->temporada]);
+        }
+
+        // PAGINACIÓN
+        $camisetas = $query->paginate(20);
+
+        // CREAR ARRAY RESULTADO
+        $resultado = [];
+
+        foreach ($camisetas as $camiseta) {
+
+            $resultado[] = [
+
+                'cod_cam' => $camiseta->cod_cam,
+                'nombre' => $camiseta->nombre,
+                'imagen_principal' => $camiseta->imagen_principal,
+                'precio' => $camiseta->precio,
+                'equipo' => $camiseta->equipo?->nombre,
+                'liga' => $camiseta->equipo?->liga?->nombre,
+                'seleccion' => $camiseta->seleccion?->nombre,
+                'temporada' => $camiseta->temporada->inicio . '/' . $camiseta->temporada->fin,
+            ];
+        }
+
+        // REEMPLAZAR LA COLECCIÓN DEL PAGINADOR
+        $camisetas->setCollection(collect($resultado));
+
+        // DEVOLVER RESULTADO
+        return response()->json($camisetas);
     }
 
-    if ($request->equipo) {
 
-        $query->whereRelation('equipo', 'nombre', $request->equipo);
+    /**
+     * Summary of crear
+     * @param Request $request
+     * @return JsonResponse
+     * 
+     * ? POST /api/camisetas/crear
+     * ! Añade una camiseta a la base de datos
+     */
+    public function crear(Request $request): JsonResponse
+    {
+
+        // Validación de datos
+        $validated = $request->validate([
+
+            'nombre' => 'required|string|max:100',
+            'color' => 'required|string|max:30',
+            'cod_tem' => 'required|integer|exists:temporada,cod_tem',
+            'precio' => 'required|numeric|min:0',
+            'imagen_principal' => 'nullable|string',
+
+            'cod_equi' => 'nullable|integer|exists:equipo,cod_equi',
+            'cod_sel' => 'nullable|integer|exists:seleccion,cod_sel',
+        ]);
+
+        // Validar que una camiseta no pertenezca a un equipo y una selección a la vez
+        if ($request->cod_equi && $request->cod_sel) {
+
+            return response()->json([
+
+                'error' => 'Una camiseta no puedo pertenecer a un equipo y una selección al mismo tiempo'
+            ], 400);
+        }
+
+        // Crear la camiseta
+        $camiseta = Camiseta::create([
+
+            'nombre' => $validated['nombre'],
+            'color' => $validated['color'],
+            'cod_tem' => $validated['cod_tem'],
+            'precio' => $validated['precio'],
+            'imagen_principal' => $validated['imagen_principal'] ?? null,
+            'cod_equi' => $validated['cod_equi'] ?? null,
+            'cod_sel' => $validated['cod_sel'] ?? null,
+        ]);
+
+
+        return response()->json([
+
+            'mensaje' => 'Camiseta creada correctamente',
+            'camiseta' => $camiseta,
+        ], 201);
     }
 
-    if ($request->seleccion) {
 
-        $query->whereRelation('seleccion', 'nombre', $request->seleccion);
-    }
-
-    if ($request->temporada) {
-
-        $query->whereRaw("CONCAT(inicio, '/', fin) = ?", [$request->temporada]);
-    }
-
-    // PAGINACIÓN
-    $camisetas = $query->paginate(20);
-
-    // CREAR ARRAY RESULTADO
-    $resultado = [];
-
-    foreach ($camisetas as $camiseta) {
-
-        $resultado[] = [
-
-            'cod_cam' => $camiseta->cod_cam,
-            'nombre' => $camiseta->nombre,
-            'imagen_principal' => $camiseta->imagen_principal,
-            'precio' => $camiseta->precio,
-            'equipo' => $camiseta->equipo?->nombre,
-            'liga' => $camiseta->equipo?->liga?->nombre,
-            'seleccion' => $camiseta->seleccion?->nombre,
-            'temporada' => $camiseta->temporada->inicio . '/' . $camiseta->temporada->fin,
-        ];
-    }
-
-    // REEMPLAZAR LA COLECCIÓN DEL PAGINADOR
-    $camisetas->setCollection(collect($resultado));
-
-    // DEVOLVER RESULTADO
-    return response()->json($camisetas);
-}
 
 
 
@@ -176,7 +233,8 @@ class CamisetaController extends Controller
      * ? GET /api/camisetas/{id}/variantes
      * ! Devuelve las variantes de una camiseta 
      */
-    public function variantes($id): VarianteCamiseta {
+    public function variantes($id): VarianteCamiseta
+    {
 
         return Camiseta::findOrFail($id)->variantes;
     }
@@ -190,7 +248,8 @@ class CamisetaController extends Controller
      * ? GET /api/camisetas/{id}/imagenes
      * ! Devuelve las imágenes de una camiseta
      */
-    public function imagenes($id): ImagenCamiseta  {
+    public function imagenes($id): ImagenCamiseta
+    {
 
         return Camiseta::findOrFail($id)->imagenes;
     }

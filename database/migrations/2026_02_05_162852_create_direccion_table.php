@@ -18,12 +18,13 @@ return new class extends Migration
             $table->string('piso', 10)->nullable();
             $table->string('cp', 10);
             $table->string('telefono', 20);
+            $table->string('ciudad', 100);
+            $table->string('provincia', 100);
+
             $table->unsignedBigInteger('cod_usu');
-            $table->unsignedBigInteger('cod_ciu');
 
             // CLAVES FORÁNEAS
             $table->foreign('cod_usu')->references('cod_usu')->on('usuario')->cascadeOnDelete();
-            $table->foreign('cod_ciu')->references('cod_ciu')->on('ciudad')->restrictOnDelete();
         });
     }
 

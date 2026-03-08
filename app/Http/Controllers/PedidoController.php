@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Direccion;
 use App\Models\Pedido;
+use App\Models\Carrito;
+use App\Models\DetalleCarrito;
 use App\Models\Usuario;
 use App\Models\DetallePedido;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class PedidoController extends Controller
 {
@@ -14,16 +17,26 @@ class PedidoController extends Controller
 
     /**
      * Summary of index
-     * @return \Illuminate\Database\Eloquent\Collection<int, Pedido>
+     * @param Request $request
+     * @return JsonResponse
      * 
      * ? GET /api/pedidos
-     * ! Devuelve todos los pedidos
+     * ! Devuelve los pedidos de un usuario
      */
-    public function index()
+    public function index(Request $request)
     {
-        
-        return Pedido::all();
+        // Obtener el usuario
+        $usuario = $request->user();
+
+        // Obtener los pedidos del usuario
+        $pedidos = Pedido::where('cod_usu', $usuario->cod_usu)->orderBy('fecha', 'desc')->get();
+
+        // Devolver los pedidos
+        return response()->json($pedidos);
     }
+
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -33,35 +46,217 @@ class PedidoController extends Controller
         //
     }
 
+    /**
+     * Summary of crear
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     * ? POST /api/pedidos/crear
+     * ! Crea un pedido
+     */
+    public function crear(Request $request): JsonResponse
+    {
+
+        $usuario = $request->user();
+
+        // Validación de datos
+        $request->validate([
+
+            'cod_dir' => 'required|integer'
+        ]);
+
+        // Obtener la dirección -> 404 si falla
+        $direccion = Direccion::findOrFail($request->cod_dir);
+
+        // Comprobar si la dirección pertenece al usuario
+        if ($direccion->cod_usu !== $usuario->cod_usu) {
+
+            return response()->json([
+
+                'error' => 'No puedes usar esta dirección'
+            ], 403);
+        }
+
+        // Obtener el carrito
+        $carrito = Carrito::where('cod_usu', $usuario->cod_usu)->first();
+
+        if (!$carrito) {
+
+            return response()->json([
+
+                'error' => 'El carrito está vacío'
+            ], 400);
+        }
+
+        // Obtener los detalles del carrito
+        $detalles = DetalleCarrito::where('cod_carr', $carrito->cod_carr)
+            ->with('variante.camiseta')->get();
+
+        if ($detalles->isEmpty()) {
+
+            return response()->json([
+
+                'error' => 'El carrito está vacío'
+            ], 400);
+        }
+
+        // Calcular el total
+        $total = 0;
+        foreach ($detalles as $det) {
+
+            $total += $det->variante->camiseta->precio * $det->cantidad;
+        }
+
+        // Crear el pedido
+        $pedido = Pedido::create([
+
+            'fecha' => now()->toDateString(),
+            'total' => $total,
+            'estado' => 'pendiente',
+            'cod_usu' => $usuario->cod_usu,
+            'cod_dir' => $direccion->cod_dir,
+        ]);
+
+        // Crear detalles del pedido
+        foreach ($detalles as $det) {
+
+            DetallePedido::create([
+
+                'precio_unid' => $det->variante->camiseta->precio,
+                'cantidad' => $det->cantidad,
+                'cod_ped' => $pedido->cod_ped,
+                'cod_var' => $det->cod_var,
+                'nombre_personalizado' => $det->nombre_personalizado,
+                'dorsal_personalizado' => $det->dorsal_personalizado
+            ]);
+
+            // Restar el stock
+            $det->variante->stock -= $det->cantidad;
+            $det->variante->save();
+        }
+
+        // Vaciar carrito
+        DetalleCarrito::where('cod_carr', $carrito->cod_carr)->delete();
+
+        return response()->json([
+
+            'mensaje' => 'Pedido creado correctamente'
+        ]);
+    }
+
 
     /**
      * Summary of show
+     * @param Request $request
      * @param mixed $id
-     * @return Pedido|\Illuminate\Database\Eloquent\Collection<int, Pedido>
+     * @return JsonResponse
      * 
      * ? GET /api/pedidos/{id}
-     * ! Devuelve un pedido asociado a un ID
+     * ! Devuelve los detalles de un pedido
      */
-    public function show($id)
+    public function show(Request $request, $id): JsonResponse
     {
-        
-        return Pedido::findOrFail($id);
+
+        // Obtener le usuario
+        $usuario = $request->user();
+
+        // Obtener el pedido -> Si falla devuelve 404
+        $pedido = Pedido::findOrFail($id);
+
+
+        // Verificar que el pedido pertenece al usuario
+        if ($pedido->cod_usu !== $usuario->cod_usu) {
+
+            return response()->json([
+
+                'error' => 'No tienes los permisos para ver este pedido'
+            ], 403);
+        }
+
+        // Obtener la direción asiciada al pedido
+        $pedido->load('direccion');
+        $direccion = $pedido->direccion;
+
+        // Obtener los detalles del pedido
+        $detalles = DetallePedido::where('cod_ped', $pedido->cod_ped)
+            ->with('variante.camiseta')->get();
+
+        // Devolver el resultado
+        return response()->json([
+
+            'pedido' => $pedido,
+            'detalles' => $detalles,
+            'direccion' => $direccion,
+        ]);
     }
 
 
 
     /**
-     * Summary of detalles
+     * Summary of cancelar
+     * @param Request $request
      * @param mixed $id
-     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\DetallePedido>
+     * @return JsonResponse
      * 
-     * ? GET /api/pedidos/{id}/detalles
-     * ! Devuelve los detalles de un pedido asociado a un ID
+     * ? DELETE /api/pedidos/cancelar/{id}
+     * ! Cancela un pedido
      */
-    public function detalles($id) {
+    public function cancelar(Request $request, $id): JsonResponse
+    {
 
-        return Pedido::findOrFail($id)->detalles;
+        // Obtener el usuario
+        $usuario = $request->user();
+
+        // Obtener el pedido -> 404 si no existe
+        $pedido = Pedido::findOrFail($id);
+
+        // Verificar que el pedido pertenece al usuario
+        if ($pedido->cod_usu !== $usuario->cod_usu) {
+
+            return response()->json([
+                
+                'error' => 'No tienes permisos para cancelar el pedido'
+            ], 403);
+        }
+
+        // Comprobar el estado del pedido
+        if ($pedido->estado !== 'pendiente') {
+
+            return response()->json([
+
+                'error' => 'Este pedido no se puede cancelar porque no está pendiente'
+            ], 400);
+        }
+
+        // Obtener los detalles del pedido
+        $detalles = DetallePedido::where('cod_ped', $pedido->cod_ped)
+            ->with('variante')
+            ->get();
+
+        // Restaurar stock de cada variante
+        foreach ($detalles as $detalle) {
+
+            $variante = $detalle->variante;
+
+            if ($variante) {
+
+                $variante->stock += $detalle->cantidad;
+                $variante->save();
+            }
+        }
+
+        // Cambiar el estado a cancelado
+        $pedido->estado = 'cancelado';
+        $pedido->save();
+
+        // Devolver respuesta
+        return response()->json([
+
+            'mensaje' => 'Pedido cancelado correctamente'
+        ]);
     }
+
+
 
     /**
      * Summary of usuario
@@ -71,7 +266,8 @@ class PedidoController extends Controller
      * ? GET /api/pedidos/{id}/usuario
      * ! Devuelve el usuario dueño de un pedido asociado a un ID
      */
-    public function usuario($id) {
+    public function usuario($id)
+    {
 
         return Pedido::findOrFail($id)->usuario;
     }
@@ -84,7 +280,8 @@ class PedidoController extends Controller
      * ? GET /api/pedidos/{id}/direccion
      * ! Devuelve la dirección de un pedido asociado a un ID
      */
-    public function direccion($id) {
+    public function direccion($id)
+    {
 
         return Pedido::findOrFail($id)->direccion;
     }

@@ -22,9 +22,14 @@ use Illuminate\Support\Facades\Route;
  */
 Route::get('/camisetas', [CamisetaController::class, 'index']);
 Route::get('/camisetas/catalogo', [CamisetaController::class, 'catalogo']);
-Route::get('/camisetas/{id}', [CamisetaController::class, 'show']);
+Route::post('/camisetas/crear', [CamisetaController::class, 'crear']);
+
 Route::get('/camisetas/{id}/variantes', [CamisetaController::class, 'variantes']);
 Route::get('/camisetas/{id}/imagenes', [CamisetaController::class, 'imagenes']);
+Route::get('/camisetas/{id}', [CamisetaController::class, 'show']);
+
+
+
 
 /**
  * 
@@ -62,14 +67,6 @@ Route::get('/equipos', [EquipoController::class, 'index']);
 Route::get('/equipos/{id}', [EquipoController::class, 'show']);
 Route::get('/equipos/{id}/camisetas', [EquipoController::class, 'camisetas']);
 
-/**
- * 
- * ! RUTAS PARA CIUDADES
- * 
- */
-Route::get('/ciudades', [CiudadController::class , 'index']);
-Route::get('/ciudades/{id}', [CiudadController::class, 'show']);
-Route::get('/ciudades/{id}/provincia', [CiudadController::class, 'provincia']);
 
 /**
  * 
@@ -91,28 +88,36 @@ Route::get('/carritos', [CarritoController::class, 'index']);
 Route::get('/carritos/{id}', [CarritoController::class, 'show']);
 Route::get('/carritos/{id}/detalles', [CarritoController::class, 'detalles']);
 Route::get('/carritos/{id}/usuario', [CarritoController::class, 'usuario']);
-Route::middleware('auth:sanctum')->post('/carrito/agregar', [CarritoController::class, 'agregar']);
+
+Route::middleware('auth:sanctum')->post('/carritos/agregar', [CarritoController::class, 'agregar']);
+Route::middleware('auth:sanctum')->delete('/carritos/eliminar/{id_detalle}', [CarritoController::class, 'eliminar']);
+Route::middleware('auth:sanctum')->patch('/carritos/aumentar/{id_detalle}', [CarritoController::class, 'aumentarCantidad']);
+Route::middleware('auth:sanctum')->patch('/carritos/disminuir/{id_detalle}', [CarritoController::class, 'disminuirCantidad']);
+Route::middleware('auth:sanctum')->delete('/carritos/vaciar', [CarritoController::class, 'vaciar']);
+Route::middleware('auth:sanctum')->get('/carritos/detalles', [CarritoController::class, 'detalles']);
+
 
 /**
  * 
- * ! RUTAS PARA DIRECCIÓNES
+ * ! RUTAS PARA DIRECCIONES
  * 
  */
-Route::get('/direcciones', [DireccionController::class, 'index']);
-Route::get('/direcciones/{id}', [DireccionController::class, 'show']);
-Route::get('/direcciones/{id}/ciudad', [DireccionController::class, 'ciudad']);
-Route::get('/direcciones/{id}/usuario', [DireccionController::class, 'usuario']);
+Route::middleware('auth:sanctum')->get('/direcciones', [DireccionController::class, 'index']);
+Route::middleware('auth:sanctum')->post('/direcciones/agregar', [DireccionController::class, 'store']);
+Route::middleware('auth:sanctum')->put('/direcciones/actualizar/{id}', [DireccionController::class, 'update']);
+Route::middleware('auth:sanctum')->delete('/direcciones/eliminar/{id}', [DireccionController::class, 'destroy']);
+
+
 
 /**
  * 
  * ! RUTAS PARA PEDIDOS
  * 
  */
-Route::get('/pedidos', [PedidoController::class, 'index']);
-Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
-Route::get('/pedidos/{id}/detalles', [PedidoController::class, 'detalles']);
-Route::get('/pedidos/{id}/usuario', [PedidoController::class, 'usuario']);
-Route::get('/pedidos/{id}/direccion', [PedidoController::class, 'direccion']);
+Route::middleware('auth:sanctum')->get('/pedidos', [PedidoController::class, 'index']);
+Route::middleware('auth:sanctum')->post('/pedidos/crear', [PedidoController::class, 'crear']);
+Route::middleware('auth:sanctum')->get('/pedidos/{id}', [PedidoController::class, 'show']);
+Route::middleware('auth:sanctum')->delete('/pedidos/cancelar/{id}', [PedidoController::class, 'cancelar']);
 
 /**
  * 

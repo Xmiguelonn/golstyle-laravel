@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('liga', function (Blueprint $table) {
             
             $table->id('cod_lig');
-            $table->string('nombre', 50);
+            $table->string('nombre', 50)->unique();
         });
     }
 
