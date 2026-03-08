@@ -2,47 +2,65 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+
+class Usuario extends Authenticatable 
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens; 
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'usuario';
+    protected $primaryKey = 'cod_usu';
+    public $timestamps = false;
+
     protected $fillable = [
-        'name',
-        'email',
+        'nombre',
+        'ape1',
+        'ape2',
+        'correo',
         'password',
+        'rol',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    
+    public function getAuthIdentifierName()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return 'correo'; 
+    }
+
+    /**
+     * Summary of direcciones
+     * @return HasMany<Direccion, Usuario>
+     * * ! Un usuario tiene muchas direcciones
+     */
+    public function direcciones(): HasMany {
+        return $this->hasMany(Direccion::class, 'cod_usu');
+    }
+
+    /**
+     * Summary of pedidos
+     * @return HasMany<Pedido, Usuario>
+     * * ! Un usuario tiene muchos pedidos
+     */
+    public function pedidos(): HasMany {
+        return $this->hasMany(Pedido::class, 'cod_usu');
+    }
+
+    /**
+     * Summary of carrito
+     * @return HasOne<Carrito, Usuario>
+     * * ! Un usuario tiene un carrito
+     */
+    public function carrito(): HasOne {
+        return $this->hasOne(Carrito::class, 'cod_usu');
     }
 }

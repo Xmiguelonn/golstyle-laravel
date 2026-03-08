@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CamisetaController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\CiudadController;
@@ -14,6 +15,19 @@ use App\Http\Controllers\TemporadaController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
+
+/**
+ * * ! RUTAS DE AUTENTICACIÓN (LOGIN/LOGOUT/REGISTER)
+ * */
+Route::post('/register', [AuthController::class, 'register']); 
+Route::post('/login', [AuthController::class, 'login']);    
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/perfil', function (Illuminate\Http\Request $request) {
+        return $request->user();
+    });
+});
 
 /**
  * 

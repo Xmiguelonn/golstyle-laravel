@@ -1,0 +1,56 @@
+# Desarrollo web en Entorno Servidor
+# Entorno de desarrollo para Laravel (sin Sail)
+services:
+  app:
+    build: .
+    container_name: laravel          # Nombre del contenedor
+    restart: unless-stopped          # Reinicia tras crashear
+    tty: true                        # Asigna terminal virtual
+    volumes:
+      - ./:/var/www/html             # Monta directorio actual
+    ports:
+      - "8000:8000"                  # Acceso web a Laravel
+      - "5173:5173"                  # Acceso a Vite (hot reload)
+    depends_on:
+      - db                           # Depende del servicio de BD
+    networks:
+      - red-dwes
+      - shared_network               # Define red virtual
+
+  db:
+    image: mysql:8.0                 # MySQL/MariaDB
+    container_name: laravel_db       # Nombre del contenedor
+    restart: always                  # Reinicia siempre
+    environment:
+      MYSQL_ROOT_PASSWORD: root      # Contraseña usuario root
+      MYSQL_DATABASE: golstyle        # Nombre de la base de datos
+      MYSQL_USER: dwes               # Nombre de usuario
+      MYSQL_PASSWORD: dwes           # Contraseña del usuario
+    volumes:
+      - db_data:/var/lib/mysql       # Persiste los datos
+    networks:
+      - red-dwes                     # Red comunicación contenedores
+
+# MONTAMOS PHPMYADMIN OPCIONALMENTE
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin     # Imagen PHPMyAdmin
+    container_name: laravel_pma      # Nombre del contenedor
+    environment:
+      PMA_HOST: db                   # Nombre del servicio host
+      PMA_USER: root                 # Usuario para login
+      PMA_PASSWORD: root             # Clave para login
+    ports:
+      - "8080:80"                    # Accedemos a través de 8080
+    depends_on:
+      - db                           # Depende del servicio de BD
+    networks:
+      - red-dwes                     # Define red virtual
+
+volumes:
+  db_data:                           # Disco virtual para la BD
+
+networks:
+  red-dwes:
+    driver: bridge
+  shared_network:
+    external: true
