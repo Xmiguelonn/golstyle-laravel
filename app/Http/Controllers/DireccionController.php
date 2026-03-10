@@ -50,6 +50,7 @@ class DireccionController extends Controller
         // Validación de datos
         $request->validate([
 
+            'nombre' => 'required|string|max:50|unique:direccion,nombre,NULL,cod_dir,cod_usu,' . $usuario->cod_usu,
             'calle' => 'required|string|max:100',
             'num' => 'required|string|max:10',
             'piso' => 'nullable|string|max:10',
@@ -62,6 +63,7 @@ class DireccionController extends Controller
         // Crear dirección
         Direccion::create([
 
+            'nombre' => $request->nombre,
             'calle' => $request->calle,
             'num' => $request->num,
             'piso' => $request->piso,
@@ -126,6 +128,7 @@ class DireccionController extends Controller
         // Validación de datos
         $request->validate([
 
+            'nombre' => 'required|string|max:50|unique:direccion,nombre,' . $id . ',cod_dir,cod_usu,' . $usuario->cod_usu,
             'calle' => 'required|string|max:100',
             'num' => 'required|string|max:10',
             'piso' => 'nullable|string|max:10',
@@ -150,6 +153,7 @@ class DireccionController extends Controller
         // Actualizar la dirección
         $direccion->update([
 
+            'nombre' => $request->nombre,
             'calle' => $request->calle,
             'num' => $request->num,
             'piso' => $request->piso,

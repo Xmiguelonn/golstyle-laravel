@@ -14,6 +14,7 @@ class Direccion extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'nombre',
         'calle',
         'num',
         'piso',
