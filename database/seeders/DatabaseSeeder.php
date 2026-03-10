@@ -12,12 +12,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
+        $this->call([            
+            UsuarioSeeder::class,
+            DireccionSeeder::class,
             LigaSeeder::class,
             EquipoSeeder::class,
             SeleccionSeeder::class,
             TemporadaSeeder::class,
             CamisetaSeeder::class,
+            VariantesCamisetaSeeder::class,
+            PedidoSeeder::class,
+            DetallePedidoSeeder::class,
         ]);
     }
 }
