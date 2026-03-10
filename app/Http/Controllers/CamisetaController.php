@@ -7,6 +7,8 @@ use App\Models\ImagenCamiseta;
 use App\Models\VarianteCamiseta;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+
 
 class CamisetaController extends Controller
 {
@@ -95,6 +97,7 @@ class CamisetaController extends Controller
         // DEVOLVER RESULTADO
         return response()->json($camisetas);
     }
+
 
 
     /**

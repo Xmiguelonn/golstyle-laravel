@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Carrito;
 use Illuminate\Http\Request;
 use App\Models\VarianteCamiseta;
-use APP\Models\DetalleCarrito;
+use App\Models\DetalleCarrito;
 use Illuminate\Http\JsonResponse;
 
 class CarritoController extends Controller
@@ -59,19 +59,15 @@ class CarritoController extends Controller
     public function detalles(Request $request): JsonResponse
     {
 
+        // Obtener el usuario
         $usuario = $request->user();
 
-        $carrito = Carrito::where('cod_usu', $usuario->cod_usu)->first();
+        // Obtener el carrito o crear un carrito nuevo
+        $carrito = Carrito::firstOrCreate([
+            'cod_usu' => $usuario->cod_usu
+        ]);
 
-        if (!$carrito) {
-
-            return response()->json([
-
-                'carrito' => null,
-                'detalles' => []
-            ]);
-        }
-
+        // Obtener los datos del carrito
         $detalles = DetalleCarrito::where('cod_carr', $carrito->cod_carr)
             ->with([
 
@@ -79,6 +75,7 @@ class CarritoController extends Controller
                 'variante'
             ])->get();
 
+        // Obtener el resultado de los detalles
         $resultadoDetalles = $detalles->map(function ($detalle) {
 
             $variante = $detalle->variante;

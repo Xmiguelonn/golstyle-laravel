@@ -19,9 +19,7 @@ class EquipoController extends Controller
     public function index()
     {
         
-        return Equipo::with([
-            'liga',
-        ])->get();
+        return Equipo::pluck('nombre');
     }
 
     /**

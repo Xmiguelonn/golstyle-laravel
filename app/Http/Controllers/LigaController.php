@@ -8,17 +8,17 @@ use Illuminate\Http\Request;
 
 class LigaController extends Controller
 {
+
     /**
      * Summary of index
-     * @return \Illuminate\Database\Eloquent\Collection<int, Liga>|\Illuminate\Support\Collection<int, \stdClass>
+     * @return \Illuminate\Support\Collection<int|string, mixed>
      * 
      * ? GET /api/ligas
-     * ! Devuelve todas las ligas
      */
     public function index()
     {
         
-        return Liga::all();
+        return Liga::pluck('nombre');
     }
 
     /**

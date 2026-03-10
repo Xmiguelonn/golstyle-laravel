@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             SeleccionSeeder::class,
             TemporadaSeeder::class,
             CamisetaSeeder::class,
+            VariantesCamisetaSeeder::class,
         ]);
     }
 }
