@@ -21,7 +21,7 @@ class CamisetaSeeder extends Seeder
             'cod_sel' => null,
         ]);
 
-        // Camiseta Manchester United
+        // Camiseta Manchester City
         Camiseta::create([
             'nombre' => 'Camiseta Manchester City 2024/2025 Home',
             'color' => 'Rojo',
