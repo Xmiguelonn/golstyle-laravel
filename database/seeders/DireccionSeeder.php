@@ -11,6 +11,7 @@ class DireccionSeeder extends Seeder
     {
         DB::table('direccion')->insert([
             [
+                'nombre' => 'Casa',
                 'calle' => 'Calle Real',
                 'num' => '10',
                 'piso' => '2A',
@@ -21,6 +22,7 @@ class DireccionSeeder extends Seeder
                 'cod_usu' => 1, // David
             ],
             [
+                'nombre' => 'Trabajo',
                 'calle' => 'Avenida de la Constitución',
                 'num' => '5',
                 'piso' => null,
@@ -31,6 +33,7 @@ class DireccionSeeder extends Seeder
                 'cod_usu' => 2, // Miguel Ángel
             ],
             [
+                'nombre' => 'Segunda dirección',
                 'calle' => 'Calle Larios',
                 'num' => '1',
                 'piso' => 'Bajo',
