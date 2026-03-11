@@ -19,7 +19,7 @@ class SeleccionController extends Controller
     public function index()
     {
         
-        return Seleccion::all();
+        return Seleccion::pluck('nombre');
     }
 
     /**

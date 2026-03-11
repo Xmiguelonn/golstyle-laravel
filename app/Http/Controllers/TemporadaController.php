@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class TemporadaController extends Controller
 {
-    
+
 
     /**
      * Summary of index
@@ -19,9 +19,9 @@ class TemporadaController extends Controller
      */
     public function index()
     {
-        
-        return Temporada::all();
+        return Temporada::selectRaw("CONCAT(inicio, '/', fin) AS temporada")->pluck('temporada');
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -31,7 +31,7 @@ class TemporadaController extends Controller
         //
     }
 
-    
+
     /**
      * Summary of show
      * @param mixed $id
@@ -54,7 +54,8 @@ class TemporadaController extends Controller
      * ? GET /api/temporadas/{id}/camisetas
      * ! Devuelve las camisetas asociadas a una temporada
      */
-    public function camisetas($id) {
+    public function camisetas($id)
+    {
 
         return Temporada::findOrFail($id)->camisetas;
     }
