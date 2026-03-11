@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('direccion', function (Blueprint $table) {
             $table->unsignedBigInteger('cod_dir')->autoIncrement();
+            $table->string('nombre', 100); // ← NUEVO CAMPO
             $table->string('calle', 100);
             $table->string('num', 10);
             $table->string('piso', 10)->nullable();
@@ -22,6 +23,8 @@ return new class extends Migration
             $table->string('provincia', 100);
 
             $table->unsignedBigInteger('cod_usu');
+            $table->unique(['cod_usu', 'nombre']);
+
 
             // CLAVES FORÁNEAS
             $table->foreign('cod_usu')->references('cod_usu')->on('usuario')->cascadeOnDelete();

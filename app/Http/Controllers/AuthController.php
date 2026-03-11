@@ -10,65 +10,64 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // 1. Validar los datos que envía Angular
+        // Validación de datos
         $request->validate([
+
             'nombre' => 'required|string|max:255',
             'ape1' => 'required|string|max:255',
-            'ape2' => 'nullable|string|max:255', // Opcional
-            'correo' => 'required|string|email|max:255|unique:usuario', // unique comprueba que el email no exista ya en la tabla 'usuario'
-            'password' => 'required|string|min:8', // Mínimo 8 caracteres
-            'rol' => 'required|string|in:admin,cliente', // Solo permite estos dos roles (ajusta según tus necesidades)
+            'ape2' => 'nullable|string|max:255', 
+            'correo' => 'required|string|email|max:255|unique:usuario', 
+            'password' => 'required|string|min:8', 
         ]);
 
-        // 2. Crear el usuario en la base de datos
-        $usuario = Usuario::create([
+        // Crear el usuario en la base de datos
+        Usuario::create([
+
             'nombre' => $request->nombre,
             'ape1' => $request->ape1,
             'ape2' => $request->ape2,
             'correo' => $request->correo,
-            'password' => Hash::make($request->password), // ¡MUY IMPORTANTE! Encriptar la contraseña
-            'rol' => $request->rol,
+            'password' => Hash::make($request->password),
         ]);
 
-        // 3. (Opcional) Autenticar al usuario inmediatamente después de registrarse
-        $token = $usuario->createToken('auth_token')->plainTextToken;
-
-        // 4. Devolver la respuesta a Angular
+        // Devolver la respuesta
         return response()->json([
-            'message' => 'Usuario registrado exitosamente',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'usuario' => $usuario
-        ], 201); // 201 Created
+
+            'mensaje' => 'Usuario registrado exitosamente',
+        ], 201);
     }
 
     public function login(Request $request)
     {
-        // 1. Validar los datos que llegan desde Angular
+        // Validación de datos
         $request->validate([
+
             'correo' => 'required|email',
             'password' => 'required'
         ]);
 
-        // 2. Buscar al usuario en la base de datos por su correo
+        // Buscar al usuario en la base de datos por su correo
         $usuario = Usuario::where('correo', $request->correo)->first();
 
-        // 3. Comprobar si el usuario existe y si la contraseña coincide
+        // Comprobar si el usuario existe y si la contraseña coincide
         if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+
             return response()->json([
+
                 'message' => 'Las credenciales son incorrectas.'
             ], 401);
         }
 
-        // 4. Crear el token de Sanctum para este usuario
+        // Crear el token de Sanctum para este usuario
         $token = $usuario->createToken('auth_token')->plainTextToken;
 
-        // 5. Devolver la respuesta a Angular con el token
+        // Devolver la respuesta a Angular con el token
         return response()->json([
+
             'message' => 'Login exitoso',
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'usuario' => $usuario // Opcional: mandamos los datos del usuario por si Angular los necesita
+            'usuario' => $usuario
         ]);
     }
 

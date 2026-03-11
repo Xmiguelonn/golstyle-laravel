@@ -50,7 +50,7 @@ class DireccionController extends Controller
         // Validación de datos
         $request->validate([
 
-            'nombre' => 'required|string|max:50|unique:direccion,nombre,NULL,cod_dir,cod_usu,' . $usuario->cod_usu,
+            'nombre' => 'required|string|max:50',
             'calle' => 'required|string|max:100',
             'num' => 'required|string|max:10',
             'piso' => 'nullable|string|max:10',
@@ -59,6 +59,16 @@ class DireccionController extends Controller
             'ciudad' => 'required|string|max:100',
             'provincia' => 'required|string|max:100',
         ]);
+
+        $existeDireccion = Direccion::where('cod_usu', $usuario->cod_usu)
+            ->where('nombre', $request->nombre)
+            ->exists();
+
+        if ($existeDireccion) {
+            return response()->json([
+                'message' => 'Ya tienes una dirección con ese nombre.'
+            ], 422);
+        }
 
         // Crear dirección
         Direccion::create([
@@ -80,18 +90,45 @@ class DireccionController extends Controller
         ]);
     }
 
+
     /**
      * Summary of show
+     * @param Request $request
      * @param mixed $id
-     * @return Direccion|\Illuminate\Database\Eloquent\Collection<int, Direccion>
+     * @return JsonResponse
      * 
      * ? GET /api/direcciones/{id}
      * ! Devuelve una dirección asociada a un ID
      */
-    public function show($id)
+    public function show(Request $request, $id): JsonResponse
     {
+        // Obtener el usuario
+        $usuario = $request->user();
 
-        return Direccion::findOrFail($id);
+        // Obtener la dirección -> 404 si falla
+        $direccion = Direccion::findOrFail($id);
+
+        // Comprobar que pertenece al usuario
+        if ($direccion->cod_usu !== $usuario->cod_usu) {
+
+            return response()->json([
+
+                'error' => 'No tienes permiso para ver esta dirección'
+            ], 403);
+        }
+
+        // Devolver la dirección
+        return response()->json([
+
+            'nombre' => $direccion->nombre,
+            'calle' => $direccion->calle,
+            'num' => $direccion->num,
+            'piso' => $direccion->piso,
+            'cp' => $direccion->cp,
+            'telefono' => $direccion->telefono,
+            'ciudad' => $direccion->ciudad,
+            'provincia' => $direccion->provincia,
+        ]);
     }
 
 
@@ -125,18 +162,6 @@ class DireccionController extends Controller
         // Obtener el usuario autenticado
         $usuario = $request->user();
 
-        // Validación de datos
-        $request->validate([
-
-            'nombre' => 'required|string|max:50|unique:direccion,nombre,' . $id . ',cod_dir,cod_usu,' . $usuario->cod_usu,
-            'calle' => 'required|string|max:100',
-            'num' => 'required|string|max:10',
-            'piso' => 'nullable|string|max:10',
-            'cp' => 'required|string|max:10',
-            'telefono' => 'required|string|max:20',
-            'ciudad' => 'required|string|max:100',
-            'provincia' => 'required|string|max:100',
-        ]);
 
         // Obtener la dirección (404 si no existe)
         $direccion = Direccion::findOrFail($id);
@@ -149,6 +174,19 @@ class DireccionController extends Controller
                 'error' => 'No tienes los permisos para editar esta dirección'
             ], 403);
         }
+
+        // Validación de datos
+        $request->validate([
+
+            'nombre' => 'required|string|max:50|unique:direccion,nombre,' . $id . ',cod_dir,cod_usu,' . $usuario->cod_usu,
+            'calle' => 'required|string|max:100',
+            'num' => 'required|string|max:10',
+            'piso' => 'nullable|string|max:10',
+            'cp' => 'required|string|max:10',
+            'telefono' => 'required|string|max:20',
+            'ciudad' => 'required|string|max:100',
+            'provincia' => 'required|string|max:100',
+        ]);
 
         // Actualizar la dirección
         $direccion->update([
@@ -168,7 +206,6 @@ class DireccionController extends Controller
 
             'mensaje' => 'Dirección actualizada con éxito'
         ]);
-
     }
 
 

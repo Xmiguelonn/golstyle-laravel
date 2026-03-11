@@ -115,6 +115,8 @@ Route::middleware('auth:sanctum')->get('/direcciones', [DireccionController::cla
 Route::middleware('auth:sanctum')->post('/direcciones/agregar', [DireccionController::class, 'store']);
 Route::middleware('auth:sanctum')->put('/direcciones/actualizar/{id}', [DireccionController::class, 'update']);
 Route::middleware('auth:sanctum')->delete('/direcciones/eliminar/{id}', [DireccionController::class, 'destroy']);
+Route::middleware('auth:sanctum')->get('/direcciones/{id}', [DireccionController::class, 'show']);
+
 
 
 
