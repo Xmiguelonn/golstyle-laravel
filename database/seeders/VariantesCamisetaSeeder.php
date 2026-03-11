@@ -33,17 +33,23 @@ class VariantesCamisetaSeeder extends Seeder
             [
                 'cod_var' => 4,
                 'cod_cam' => 2,
+                'talla' => 'S',
+                'stock' => 15,
+            ],
+            [
+                'cod_var' => 5,
+                'cod_cam' => 2,
                 'talla' => 'M',
                 'stock' => 20,
             ],
             [
-                'cod_var' => 5,
+                'cod_var' => 6,
                 'cod_cam' => 2,
                 'talla' => 'L',
                 'stock' => 12,
             ],
             [
-                'cod_var' => 6,
+                'cod_var' => 7,
                 'cod_cam' => 2,
                 'talla' => 'XL',
                 'stock' => 8,

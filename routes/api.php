@@ -38,9 +38,8 @@ Route::get('/camisetas', [CamisetaController::class, 'index']);
 Route::get('/camisetas/catalogo', [CamisetaController::class, 'catalogo']);
 Route::post('/camisetas/crear', [CamisetaController::class, 'crear']);
 
-Route::get('/camisetas/{id}/variantes', [CamisetaController::class, 'variantes']);
-Route::get('/camisetas/{id}/imagenes', [CamisetaController::class, 'imagenes']);
-Route::get('/camisetas/{id}', [CamisetaController::class, 'show']);
+Route::get('/camisetas/{id}', [CamisetaController::class, 'show'])->where('id', '[0-9]+');
+
 
 
 
@@ -98,17 +97,13 @@ Route::get('/usuarios/{id}/carrito', [UsuarioController::class, 'carrito']);
  * ! RUTAS PARA CARRITOS
  * 
  */
-Route::get('/carritos', [CarritoController::class, 'index']);
-Route::get('/carritos/{id}', [CarritoController::class, 'show']);
-Route::get('/carritos/{id}/detalles', [CarritoController::class, 'detalles']);
-Route::get('/carritos/{id}/usuario', [CarritoController::class, 'usuario']);
-
 Route::middleware('auth:sanctum')->post('/carritos/agregar', [CarritoController::class, 'agregar']);
+Route::middleware('auth:sanctum')->delete('/carritos/vaciar', [CarritoController::class, 'vaciar']);
+Route::middleware('auth:sanctum')->get('/carritos/detalles', [CarritoController::class, 'detalles']);
 Route::middleware('auth:sanctum')->delete('/carritos/eliminar/{id_detalle}', [CarritoController::class, 'eliminar']);
 Route::middleware('auth:sanctum')->patch('/carritos/aumentar/{id_detalle}', [CarritoController::class, 'aumentarCantidad']);
 Route::middleware('auth:sanctum')->patch('/carritos/disminuir/{id_detalle}', [CarritoController::class, 'disminuirCantidad']);
-Route::middleware('auth:sanctum')->delete('/carritos/vaciar', [CarritoController::class, 'vaciar']);
-Route::middleware('auth:sanctum')->get('/carritos/detalles', [CarritoController::class, 'detalles']);
+
 
 
 /**
