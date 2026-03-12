@@ -8,6 +8,14 @@ use App\Models\Usuario;
 
 class AuthController extends Controller
 {
+    /**
+     * Summary of register
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     * ? POST /api/register
+     * ! Registrar a un nuevo usuario
+     */
     public function register(Request $request)
     {
         // Validación de datos
@@ -27,7 +35,8 @@ class AuthController extends Controller
             'ape1' => $request->ape1,
             'ape2' => $request->ape2,
             'correo' => $request->correo,
-            'password' => Hash::make($request->password),
+            // Crear la consetraña encriptada
+            'password' => Hash::make($request->password), 
         ]);
 
         // Devolver la respuesta
@@ -37,6 +46,14 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Summary of login
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     * ? POST /api/login
+     * ! Hacer el loguin para un usuario
+     */
     public function login(Request $request)
     {
         // Validación de datos
@@ -71,6 +88,14 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Summary of logout
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     * ? POST /api/logout
+     * ! Cerrar sesión
+     */
     public function logout(Request $request)
     {
         // Borrar el token actual de la base de datos para cerrar sesión

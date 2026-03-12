@@ -13,12 +13,15 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\SeleccionController;
 use App\Http\Controllers\TemporadaController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ContactoController;
 use Illuminate\Support\Facades\Route;
 
 
 /**
- * * ! RUTAS DE AUTENTICACIÓN (LOGIN/LOGOUT/REGISTER)
- * */
+ * 
+ *  ! RUTAS DE AUTENTICACIÓN (LOGIN/LOGOUT/REGISTER)
+ * 
+ */
 Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']);    
 
@@ -149,3 +152,10 @@ Route::get('/detalle-carritos' , [DetalleCarritoController::class, 'index']);
 Route::get('/detalle-carritos/{id}', [DetalleCarritoController::class, 'show']);
 Route::get('/detalle-carritos/{id}/carrito', [DetalleCarritoController::class, 'carrito']);
 Route::get('/detalle-carritos/{id}/variante', [DetalleCarritoController::class, 'variante']);
+
+/**
+ * 
+ * ! RUTAS PARA CONTACTOS
+ * 
+ */
+Route::post('/contacto/enviar', [ContactoController::class, 'enviar']);
