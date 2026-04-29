@@ -16,6 +16,8 @@ class Usuario extends Authenticatable
     protected $primaryKey = 'cod_usu';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string { return 'cod_usu'; }
+
     protected $fillable = [
         'nombre',
         'ape1',

@@ -11,6 +11,11 @@ class VarianteCamiseta extends Model
     protected $primaryKey = 'cod_var';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string
+    {
+        return 'cod_var';
+    }
+
     protected $fillable = [
         'cod_cam',
         'talla', 

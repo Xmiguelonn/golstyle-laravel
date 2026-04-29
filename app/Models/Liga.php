@@ -11,6 +11,8 @@ class Liga extends Model
     protected $primaryKey = 'cod_lig';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string { return 'cod_lig'; }
+
     protected $fillable = [
         'nombre'
     ];

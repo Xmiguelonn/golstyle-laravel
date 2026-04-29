@@ -12,6 +12,11 @@ class Camiseta extends Model
     protected $primaryKey = 'cod_cam';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string
+    {
+        return 'cod_cam';
+    }
+
     protected $fillable = [
         'nombre',
         'color', 

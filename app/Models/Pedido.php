@@ -12,6 +12,8 @@ class Pedido extends Model
     protected $primaryKey = 'cod_ped';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string { return 'cod_ped'; }
+
     protected $fillable = [
         'fecha',
         'total',

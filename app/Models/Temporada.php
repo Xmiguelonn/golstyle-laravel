@@ -11,6 +11,8 @@ class Temporada extends Model
     protected $primaryKey = 'cod_tem';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string { return 'cod_tem'; }
+
     protected $fillable = [
         'inicio', 
         'fin'

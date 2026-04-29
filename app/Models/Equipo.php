@@ -13,6 +13,8 @@ class Equipo extends Model
     protected $primaryKey = 'cod_equi';
     public $timestamps = false;
 
+    public function getRouteKeyName(): string { return 'cod_equi'; }
+
     protected $fillable = [
         'nombre', 
         'cod_lig'

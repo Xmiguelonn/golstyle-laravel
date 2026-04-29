@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Seleccion extends Model
 {
     protected $table = 'seleccion';
-
     protected $primaryKey = 'cod_sel';
-
     public $timestamps = false;
+
+    public function getRouteKeyName(): string { return 'cod_sel'; }
     protected $fillable = [
         'nombre'
     ];
