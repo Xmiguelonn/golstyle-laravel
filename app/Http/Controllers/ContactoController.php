@@ -5,18 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Contacto;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactoMail;
 
 class ContactoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-
     /**
      * 
      * @param Request $request
@@ -36,6 +29,14 @@ class ContactoController extends Controller
             'idPedido' => 'nullable|string',
         ]);
 
+        // Datos para el correo
+        $data = [
+            'correo' => $request->correo,
+            'asunto' => $request->asunto,
+            'mensaje' => $request->mensaje,
+            'idPedido' => $request->idPedido,
+        ];
+
         // Guardar en BD
         Contacto::create([
 
@@ -45,36 +46,13 @@ class ContactoController extends Controller
             'mensaje' => $request->mensaje,
         ]);
 
+        Mail::to('davidrivasg06@gmail.com')->send(new ContactoMail($data));
+
         // Devolver respuesta
         return response()->json([
 
             'mensaje' => 'Mensaje enviado correctamente.'
         ], 200);
 
-
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
