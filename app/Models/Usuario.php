@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerificacionMail;
+use Illuminate\Support\Facades\URL;
 
-class Usuario extends Authenticatable 
+class Usuario extends Authenticatable implements MustVerifyEmail 
 {
     use HasApiTokens, Notifiable;
     
@@ -50,5 +54,33 @@ class Usuario extends Authenticatable
      */
     public function carrito(): HasOne {
         return $this->hasOne(Carrito::class, 'cod_usu');
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $urlLaravel = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $this->getKey(), 'hash' => sha1($this->getEmailForVerification())]
+        );
+
+        $urlAngular = "http://localhost:4217/verificar-email?url=" . urlencode($urlLaravel);
+
+        Mail::to($this->correo)->send(new VerificacionMail($this, $urlAngular));
+    }
+
+    public function getEmailForVerification()
+    {
+        return $this->correo;
+    }
+
+    public function routeNotificationForMail($notification)
+    {
+        return $this->correo;
+    }
+
+    public function hasVerifiedEmail()
+    {
+        return ! is_null($this->email_verified_at);
     }
 }

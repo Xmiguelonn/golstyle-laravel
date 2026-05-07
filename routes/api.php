@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CamisetaController;
 use App\Http\Controllers\CarritoController;
-use App\Http\Controllers\CiudadController;
 use App\Http\Controllers\DetalleCarritoController;
 use App\Http\Controllers\DetallePedidoController;
 use App\Http\Controllers\DireccionController;
@@ -15,7 +14,10 @@ use App\Http\Controllers\TemporadaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ContactoController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Http\Request;
+use App\Models\Usuario;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BienvenidaMail;
 
 /**
  * 
@@ -42,10 +44,6 @@ Route::get('/camisetas/catalogo', [CamisetaController::class, 'catalogo']);
 Route::post('/camisetas/crear', [CamisetaController::class, 'crear']);
 
 Route::get('/camisetas/{id}', [CamisetaController::class, 'show'])->where('id', '[0-9]+');
-
-
-
-
 
 /**
  * 
@@ -159,3 +157,23 @@ Route::get('/detalle-carritos/{id}/variante', [DetalleCarritoController::class, 
  * 
  */
 Route::post('/contacto/enviar', [ContactoController::class, 'enviar']);
+
+/**
+ * 
+ * ! RUTAS PARA EMAIL
+ * 
+ */
+Route::get('/email/verify/{id}/{hash}', function (Request $request, $id) {
+    $usuario = Usuario::findOrFail($id);
+
+    if (!$usuario->hasVerifiedEmail()) {
+        
+        $usuario->markEmailAsVerified(); 
+
+        Mail::to($usuario->correo)->send(new BienvenidaMail($usuario));
+    }
+
+    return response()->json(['message' => 'Email verificado y correo de bienvenida enviado']);
+    
+})->middleware(['signed'])->name('verification.verify');
+

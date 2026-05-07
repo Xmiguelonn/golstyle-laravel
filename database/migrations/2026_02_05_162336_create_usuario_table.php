@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('correo', 100)->unique();
             $table->string('password', 255);
             $table->string('rol', 50)->default('usuario');
+            $table->timestamp('email_verified_at')->nullable();
         });
     }
 

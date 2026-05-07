@@ -17,6 +17,7 @@ class UsuarioSeeder extends Seeder
                 'correo' => 'david@gmail.com',
                 'password' => '$2y$12$5M9wD.YarHzLSO1CHVYjNO161GgCxxjovAsDlXIr26u6vTpMIzesm',
                 'rol' => 'usuario',
+                'email_verified_at' => now(),
             ],
             [
                 'nombre' => 'Miguel Angel',
@@ -25,6 +26,7 @@ class UsuarioSeeder extends Seeder
                 'correo' => 'miguel@gmail.com',
                 'password' => '$2y$12$5M9wD.YarHzLSO1CHVYjNO161GgCxxjovAsDlXIr26u6vTpMIzesm',
                 'rol' => 'usuario',
+                'email_verified_at' => now(),                
             ],
             [
                 'nombre' => 'Manolo',
@@ -33,6 +35,7 @@ class UsuarioSeeder extends Seeder
                 'correo' => 'manolo@gmail.com',
                 'password' => '$2y$12$5M9wD.YarHzLSO1CHVYjNO161GgCxxjovAsDlXIr26u6vTpMIzesm',
                 'rol' => 'usuario',
+                'email_verified_at' => now(),
             ]
         ]);
     }

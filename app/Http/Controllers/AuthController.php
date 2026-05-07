@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
+use Illuminate\Auth\Events\Registered;
+use App\Mail\BienvenidaMail;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -29,7 +32,7 @@ class AuthController extends Controller
         ]);
 
         // Crear el usuario en la base de datos
-        Usuario::create([
+        $usuario = Usuario::create([
 
             'nombre' => $request->nombre,
             'ape1' => $request->ape1,
@@ -39,10 +42,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password), 
         ]);
 
+        // Lanzamos el correo de verificación automáticamente
+        $usuario->sendEmailVerificationNotification();
+
         // Devolver la respuesta
         return response()->json([
 
-            'mensaje' => 'Usuario registrado exitosamente',
+            'mensaje' => 'Registro casi listo. Por favor, verifica tu correo.',
         ], 201);
     }
 
@@ -73,6 +79,13 @@ class AuthController extends Controller
 
                 'message' => 'Las credenciales son incorrectas.'
             ], 401);
+        }
+
+        // Comprobar si el usuario ha verificado su cuenta
+        if (!$usuario->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Debes verificar tu correo electrónico antes de poder iniciar sesión. Revisa tu bandeja de entrada.'
+            ], 403); // Devolvemos un 403 (Prohibido)
         }
 
         // Crear el token de Sanctum para este usuario
