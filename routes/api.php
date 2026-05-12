@@ -163,17 +163,6 @@ Route::post('/contacto/enviar', [ContactoController::class, 'enviar']);
  * ! RUTAS PARA EMAIL
  * 
  */
-Route::get('/email/verify/{id}/{hash}', function (Request $request, $id) {
-    $usuario = Usuario::findOrFail($id);
-
-    if (!$usuario->hasVerifiedEmail()) {
-        
-        $usuario->markEmailAsVerified(); 
-
-        Mail::to($usuario->correo)->send(new BienvenidaMail($usuario));
-    }
-
-    return response()->json(['message' => 'Email verificado y correo de bienvenida enviado']);
-    
-})->middleware(['signed'])->name('verification.verify');
-
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verificarEmail'])
+    ->middleware(['signed'])
+    ->name('verification.verify');

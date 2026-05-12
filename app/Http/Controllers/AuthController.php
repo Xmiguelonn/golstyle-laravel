@@ -118,4 +118,22 @@ class AuthController extends Controller
             'message' => 'Sesión cerrada correctamente'
         ]);
     }
+
+    public function verificarEmail(Request $request, $id, $hash)
+    {
+        $usuario = Usuario::findOrFail($id);
+
+        // Comprobamos si ya estaba verificado
+        if (!$usuario->hasVerifiedEmail()) {
+            
+            // Marcamos el correo como verificado en la BD
+            $usuario->markEmailAsVerified(); 
+
+            // Enviamos el correo de bienvenida
+            Mail::to($usuario->correo)->send(new BienvenidaMail($usuario));
+        }
+
+        // 3. Devolvemos el OK a Angular
+        return response()->json(['message' => 'Email verificado y correo de bienvenida enviado']);
+    }
 }
