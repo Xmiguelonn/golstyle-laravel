@@ -45,7 +45,8 @@
     .info-value { font-size: 0.9rem; color: #ddd; font-weight: 500; }
 
     /* ITEMS TABLE */
-    .items-table { width: 100%; border-collapse: collapse; }
+    .items-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+    .items-table { width: 100%; min-width: 480px; border-collapse: collapse; }
 
     .items-table th {
         padding: 10px 16px; font-size: 0.67rem; font-weight: 700;
@@ -159,6 +160,7 @@
         {{-- Artículos --}}
         <div class="detail-card">
             <div class="card-head">Artículos del pedido</div>
+            <div class="items-table-wrap">
             <table class="items-table">
                 <thead><tr>
                     <th></th>
@@ -199,6 +201,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- Dirección --}}

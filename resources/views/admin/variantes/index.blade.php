@@ -21,6 +21,7 @@
         gap: 16px;
         padding: 18px 24px;
         border-bottom: 1px solid #1a1a1a;
+        flex-wrap: wrap;
     }
 
     .cam-thumb {
@@ -114,6 +115,13 @@
     .t-stock.zero  { color: #dc3545; }
     .t-stock.low   { color: #fd7e14; }
     .t-stock.ok    { color: #75b798; }
+
+    @media (max-width: 520px) {
+        .cam-header { padding: 14px 16px; gap: 12px; }
+        .tallas-row { padding: 12px 16px; }
+        .cam-edit-btn { width: 100%; justify-content: center; }
+        .cam-nombre { font-size: 0.88rem; }
+    }
 
     .no-variantes {
         padding: 14px 24px;

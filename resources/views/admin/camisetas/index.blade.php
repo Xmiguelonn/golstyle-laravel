@@ -73,8 +73,14 @@
         overflow: hidden;
     }
 
+    .data-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .data-table {
         width: 100%;
+        min-width: 720px;
         border-collapse: collapse;
     }
 
@@ -275,6 +281,7 @@
             No hay camisetas en el catálogo.
         </div>
     @else
+        <div class="data-table-scroll">
         <table class="data-table">
             <thead>
                 <tr>
@@ -340,6 +347,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         @if($camisetas->hasPages())
         <div class="pagination-wrap">

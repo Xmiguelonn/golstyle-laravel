@@ -15,6 +15,10 @@
 
     .filter-input { width: 220px; }
 
+    @media (max-width: 520px) {
+        .filter-input, .filter-select, .btn-filter, .btn-reset { width: 100%; }
+    }
+
     .filter-input:focus, .filter-select:focus {
         outline: none; border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
     }
@@ -39,7 +43,8 @@
     .btn-reset:hover { border-color: #444; color: #999; }
 
     .data-table-wrap { background: #161616; border: 1px solid #1f1f1f; border-radius: 12px; overflow: hidden; }
-    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table { width: 100%; min-width: 640px; border-collapse: collapse; }
 
     .data-table thead th {
         padding: 13px 18px; font-size: 0.67rem; font-weight: 700; color: #444;
@@ -142,6 +147,7 @@
     @if($usuarios->isEmpty())
         <p class="empty-state">No hay usuarios con los filtros aplicados.</p>
     @else
+    <div class="data-table-scroll">
     <table class="data-table">
         <thead><tr>
             <th>#</th>
@@ -203,6 +209,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 
     @if($usuarios->hasPages())
     <div class="pagination-wrap">

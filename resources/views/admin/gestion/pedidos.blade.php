@@ -25,6 +25,10 @@
     .filter-input { width: 200px; }
     .filter-select { min-width: 150px; }
 
+    @media (max-width: 520px) {
+        .filter-input, .filter-select, .btn-filter, .btn-reset { width: 100%; }
+    }
+
     .filter-input:focus, .filter-select:focus {
         outline: none;
         border-color: #d4af37;
@@ -64,7 +68,8 @@
         overflow: hidden;
     }
 
-    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table { width: 100%; min-width: 520px; border-collapse: collapse; }
 
     .data-table thead th {
         padding: 13px 18px;
@@ -156,6 +161,7 @@
     @if($pedidos->isEmpty())
         <p class="empty-state">No hay pedidos con los filtros aplicados.</p>
     @else
+    <div class="data-table-scroll">
     <table class="data-table">
         <thead><tr>
             <th>#</th>
@@ -187,6 +193,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 
     @if($pedidos->hasPages())
     <div class="pagination-wrap">

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
@@ -18,6 +19,13 @@ Route::get('/', function () {
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Redirige /admin según si hay sesión activa de admin
+    Route::get('/', function () {
+        return redirect()->route(
+            Auth::check() && Auth::user()->rol === 'admin' ? 'admin.dashboard' : 'admin.login'
+        );
+    });
 
     // Acceso público al login
     Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');

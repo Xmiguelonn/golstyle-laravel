@@ -151,6 +151,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-width: 0;
         }
 
         /* ── TOPBAR ─────────────────────────────────────────── */
@@ -165,6 +166,7 @@
             position: sticky;
             top: 0;
             z-index: 50;
+            flex-shrink: 0;
         }
 
         .topbar-left { display: flex; align-items: center; gap: 16px; }
@@ -247,17 +249,65 @@
             color: #ff6b6b;
         }
 
+        /* ── HAMBURGER ──────────────────────────────────────── */
+        .btn-hamburger {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 38px; height: 38px;
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-hamburger:hover { border-color: #d4af37; color: #d4af37; }
+        .btn-hamburger svg { width: 20px; height: 20px; }
+
+        /* ── OVERLAY ────────────────────────────────────────── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 99;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* ── GLOBAL RESPONSIVE FIX ─────────────────────────── */
+        .main-wrapper { min-width: 0; }
+        .content      { overflow-x: hidden; }
+        img           { max-width: 100%; height: auto; }
+
+        /* Todas las tablas: contenedor con scroll horizontal */
+        .data-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table        { min-width: 620px; border-collapse: collapse; }
+
+        /* Cards y filas flex */
+        .page-actions { flex-wrap: wrap; }
+        .actions      { flex-wrap: nowrap; }
+
         /* ── RESPONSIVE ─────────────────────────────────────── */
         @media (max-width: 900px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
             .main-wrapper { margin-left: 0; }
+            .btn-hamburger { display: flex; }
+            .topbar { padding: 0 16px; }
+            .content { padding: 20px 12px; }
+            .btn-logout-text { display: none; }
+            .btn-logout { padding: 8px 10px; }
+            .content-header h2 { font-size: 1.3rem; }
         }
     </style>
     @stack('styles')
 </head>
 <body>
 
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <span class="brand-icon">⚽</span>
@@ -341,12 +391,18 @@
 <div class="main-wrapper">
     <header class="topbar">
         <div class="topbar-left">
+            <button class="btn-hamburger" id="btnHamburger" aria-label="Abrir menú">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
             <span class="page-title">@yield('title', 'Dashboard')</span>
         </div>
         <div class="topbar-right">
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="btn-logout">Cerrar sesión</button>
+                <button type="submit" class="btn-logout" title="Cerrar sesión">
+                    <svg style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span class="btn-logout-text">Cerrar sesión</span>
+                </button>
             </form>
         </div>
     </header>
@@ -364,5 +420,21 @@
 </div>
 
 @stack('scripts')
+<script>
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+    const btnHamb  = document.getElementById('btnHamburger');
+
+    function openSidebar()  { sidebar.classList.add('open');  overlay.classList.add('active'); }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
+
+    btnHamb.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+    overlay.addEventListener('click', closeSidebar);
+
+    // Cierra el menú al navegar en móvil
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => { if (window.innerWidth <= 900) closeSidebar(); });
+    });
+</script>
 </body>
 </html>

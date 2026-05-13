@@ -16,8 +16,8 @@ class AdminController extends Controller
         $stats = [
             'usuarios'           => Usuario::where('rol', 'usuario')->count(),
             'camisetas'          => Camiseta::count(),
-            'pedidos'            => Pedido::count(),
-            'ingresos'           => Pedido::sum('total'),
+            'pedidos'            => Pedido::where('estado', '!=', 'cancelado')->count(),
+            'ingresos'           => Pedido::where('estado', '!=', 'cancelado')->sum('total'),
             'pedidos_pendientes' => Pedido::where('estado', 'pendiente')->count(),
             'mensajes'           => Contacto::count(),
         ];

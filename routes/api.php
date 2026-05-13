@@ -13,6 +13,7 @@ use App\Http\Controllers\SeleccionController;
 use App\Http\Controllers\TemporadaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ContactoController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
@@ -159,10 +160,17 @@ Route::get('/detalle-carritos/{id}/variante', [DetalleCarritoController::class, 
 Route::post('/contacto/enviar', [ContactoController::class, 'enviar']);
 
 /**
- * 
+ *
  * ! RUTAS PARA EMAIL
- * 
+ *
  */
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verificarEmail'])
     ->middleware(['signed'])
     ->name('verification.verify');
+
+/**
+ *
+ * ! RUTA PARA CHATBOT
+ *
+ */
+Route::post('/chat', [ChatbotController::class, 'chat']);
