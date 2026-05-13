@@ -16,11 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('cod_ped')->autoIncrement();
             $table->date('fecha');
             $table->decimal('total', 10, 2);
-            $table->string('estado', 20);
+            $table->unsignedBigInteger('estado_id');
             $table->unsignedBigInteger('cod_usu');
             $table->unsignedBigInteger('cod_dir')->nullable();
 
             // CLAVES FORÁNEAS
+            $table->foreign('estado_id')->references('id')->on('estado_pedido');
             $table->foreign('cod_usu')->references('cod_usu')->on('usuario')->cascadeOnDelete();
             $table->foreign('cod_dir')->references('cod_dir')->on('direccion')->nullOnDelete();
         });

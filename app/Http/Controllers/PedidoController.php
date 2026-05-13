@@ -29,7 +29,7 @@ class PedidoController extends Controller
         $usuario = $request->user();
 
         // Obtener los pedidos del usuario
-        $pedidos = Pedido::where('cod_usu', $usuario->cod_usu)->orderBy('fecha', 'desc')->get();
+        $pedidos = Pedido::where('cod_usu', $usuario->cod_usu)->with('estadoObj')->orderBy('fecha', 'desc')->get();
 
         // Devolver los pedidos
         return response()->json($pedidos);
@@ -174,7 +174,7 @@ class PedidoController extends Controller
         }
 
         // Obtener la direción asiciada al pedido
-        $pedido->load('direccion');
+        $pedido->load(['direccion', 'estadoObj']);
         $direccion = $pedido->direccion;
 
         // Obtener los detalles del pedido

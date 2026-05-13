@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Camiseta;
 use App\Models\Contacto;
+use App\Models\EstadoPedido;
 use App\Models\Pedido;
+use App\Models\Rol;
 use App\Models\Usuario;
 use App\Models\VarianteCamiseta;
 
@@ -14,11 +16,11 @@ class AdminController extends Controller
     public function dashboard()
     {
         $stats = [
-            'usuarios'           => Usuario::where('rol', 'usuario')->count(),
+            'usuarios'           => Usuario::where('rol_id', Rol::USUARIO)->count(),
             'camisetas'          => Camiseta::count(),
-            'pedidos'            => Pedido::where('estado', '!=', 'cancelado')->count(),
-            'ingresos'           => Pedido::where('estado', '!=', 'cancelado')->sum('total'),
-            'pedidos_pendientes' => Pedido::where('estado', 'pendiente')->count(),
+            'pedidos'            => Pedido::where('estado_id', '!=', EstadoPedido::CANCELADO)->count(),
+            'ingresos'           => Pedido::where('estado_id', '!=', EstadoPedido::CANCELADO)->sum('total'),
+            'pedidos_pendientes' => Pedido::where('estado_id', EstadoPedido::PENDIENTE)->count(),
             'mensajes'           => Contacto::count(),
         ];
 

@@ -20,8 +20,10 @@ return new class extends Migration
             $table->string('ape2', 50)->nullable();
             $table->string('correo', 100)->unique();
             $table->string('password', 255);
-            $table->string('rol', 50)->default('usuario');
+            $table->unsignedBigInteger('rol_id')->default(1);
             $table->timestamp('email_verified_at')->nullable();
+
+            $table->foreign('rol_id')->references('id')->on('rol');
         });
     }
 

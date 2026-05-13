@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rol;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +12,13 @@ class UsuarioAdminController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Usuario::withCount('pedidos')->orderBy('nombre');
+        $query = Usuario::withCount('pedidos')->with('rolRelacion')->orderBy('nombre');
 
         if ($request->filled('rol')) {
-            $query->where('rol', $request->rol);
+            $rolId = Rol::where('nombre', $request->rol)->value('id');
+            if ($rolId) {
+                $query->where('rol_id', $rolId);
+            }
         }
 
         if ($request->filled('buscar')) {

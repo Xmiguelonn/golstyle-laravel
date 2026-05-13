@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EstadoPedido;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,13 @@ class PedidoAdminController extends Controller
 
     public function index(Request $request)
     {
-        $query = Pedido::with('usuario')->orderByDesc('fecha')->orderByDesc('cod_ped');
+        $query = Pedido::with(['usuario', 'estadoObj'])->orderByDesc('fecha')->orderByDesc('cod_ped');
 
         if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
+            $estadoId = EstadoPedido::where('nombre', $request->estado)->value('id');
+            if ($estadoId) {
+                $query->where('estado_id', $estadoId);
+            }
         }
 
         if ($request->filled('buscar')) {
