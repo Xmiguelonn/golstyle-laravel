@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EstadoPedidoMail;
+use App\Mail\ResumenPedidoMail;
 
 class PedidoController extends Controller
 {
@@ -139,6 +140,8 @@ class PedidoController extends Controller
 
         // Vaciar carrito
         DetalleCarrito::where('cod_carr', $carrito->cod_carr)->delete();
+
+        Mail::to($usuario->correo)->send(new ResumenPedidoMail($pedido));
 
         return response()->json([
 
