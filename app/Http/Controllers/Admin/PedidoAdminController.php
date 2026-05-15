@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\EstadoPedido;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EstadoPedidoMail;
 
 class PedidoAdminController extends Controller
 {
@@ -44,6 +46,8 @@ class PedidoAdminController extends Controller
     {
         $request->validate(['estado' => 'required|in:' . implode(',', self::ESTADOS)]);
         $pedido->update(['estado' => $request->estado]);
+
+        Mail::to($pedido->usuario->correo)->send(new EstadoPedidoMail($pedido));
 
         return redirect()->route('admin.pedidos.show', $pedido->cod_ped)
             ->with('success', 'Estado actualizado a «' . ucfirst($request->estado) . '».');

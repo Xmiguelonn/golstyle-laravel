@@ -10,6 +10,8 @@ use App\Models\Usuario;
 use App\Models\DetallePedido;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EstadoPedidoMail;
 
 class PedidoController extends Controller
 {
@@ -248,6 +250,10 @@ class PedidoController extends Controller
         // Cambiar el estado a cancelado
         $pedido->estado = 'cancelado';
         $pedido->save();
+
+        $pedido->refresh();
+
+        Mail::to($pedido->usuario->correo)->send(new EstadoPedidoMail($pedido));
 
         // Devolver respuesta
         return response()->json([
